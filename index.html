@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liquid Light Show</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
+    canvas { display: block; }
+    #ui {
+      position: fixed; top: 0; right: 0;
+      width: 240px;
+      background: rgba(0,0,0,0.78);
+      backdrop-filter: blur(8px);
+      border-left: 1px solid rgba(255,255,255,0.07);
+      padding: 16px;
+      color: rgba(255,255,255,0.85);
+      font-size: 11px; line-height: 1.6;
+      z-index: 10; user-select: none;
+      overflow-y: auto;
+      max-height: 100vh;
+    }
+    #ui h2 {
+      font-size: 10px; letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      padding-bottom: 8px;
+    }
+    .section-label {
+      font-size: 9px; letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.28);
+      margin: 12px 0 6px;
+    }
+    .param { margin-bottom: 8px; }
+    .param label { display: flex; justify-content: space-between; margin-bottom: 3px; color: rgba(255,255,255,0.65); }
+    .param label span { color: rgba(255,255,255,0.3); font-variant-numeric: tabular-nums; }
+    input[type=range] {
+      width: 100%; height: 2px;
+      -webkit-appearance: none; appearance: none;
+      background: rgba(255,255,255,0.12); outline: none; cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 10px; height: 10px;
+      border-radius: 50%; background: rgba(255,255,255,0.75); cursor: pointer;
+    }
+    .regime-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 4px; }
+    .regime-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.5); padding: 5px 4px;
+      font-size: 9px; letter-spacing: 0.06em;
+      cursor: pointer; transition: all 0.12s; font-family: inherit;
+    }
+    .regime-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .regime-btn.active { background: rgba(255,255,255,0.13); border-color: rgba(255,255,255,0.28); color: #fff; }
+    #upload-btn {
+      width: 100%; margin-top: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.5); padding: 6px;
+      font-size: 9px; letter-spacing: 0.08em;
+      cursor: pointer; font-family: inherit;
+    }
+    #upload-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    #file-input { display: none; }
+    .fps { position: fixed; bottom: 8px; left: 8px; font-family: monospace; font-size: 10px; color: rgba(255,255,255,0.2); z-index: 10; }
+    #hint { position: fixed; bottom: 8px; left: 50%; transform: translateX(-50%); font-family: monospace; font-size: 9px; color: rgba(255,255,255,0.18); z-index: 10; letter-spacing: 0.1em; }
+  </style>
+</head>
+<body>
+  <div id="ui">
+    <h2>Liquid Light Show</h2>
+
+    <div class="section-label">Regime</div>
+    <div class="regime-btns">
+      <button class="regime-btn active" data-regime="fillmore_1967">fillmore '67</button>
+      <button class="regime-btn" data-regime="boiling_acid">boiling acid</button>
+      <button class="regime-btn" data-regime="oil_slick">oil slick</button>
+      <button class="regime-btn" data-regime="ink_in_water">ink in water</button>
+    </div>
+
+    <div class="section-label">Fluid</div>
+    <div class="param">
+      <label>viscosity <span id="v-viscosity">0.020</span></label>
+      <input type="range" id="viscosity" min="0" max="0.1" step="0.001" value="0.02">
+    </div>
+    <div class="param">
+      <label>heat buoyancy <span id="v-heat_buoyancy">0.50</span></label>
+      <input type="range" id="heat_buoyancy" min="0" max="2" step="0.01" value="0.5">
+    </div>
+    <div class="param">
+      <label>surface tension <span id="v-surface_tension">0.50</span></label>
+      <input type="range" id="surface_tension" min="0" max="1" step="0.01" value="0.5">
+    </div>
+    <div class="param">
+      <label>dye injection <span id="v-dye_injection">0.60</span></label>
+      <input type="range" id="dye_injection" min="0" max="1" step="0.01" value="0.6">
+    </div>
+
+    <div class="section-label">Optics</div>
+    <div class="param">
+      <label>film thickness <span id="v-film_thickness_scale">400</span>nm</label>
+      <input type="range" id="film_thickness_scale" min="0" max="1000" step="1" value="400">
+    </div>
+    <div class="param">
+      <label>defocus <span id="v-defocus">0.30</span></label>
+      <input type="range" id="defocus" min="0" max="1" step="0.01" value="0.3">
+    </div>
+
+    <div class="section-label">Source</div>
+    <button id="upload-btn">upload image source</button>
+    <input type="file" id="file-input" accept="image/*">
+  </div>
+
+  <div class="fps" id="fps">-- fps</div>
+  <div id="hint">click + drag to inject dye</div>
+
+  <script src="src/js/main.js" type="module"></script>
+</body>
+</html>
