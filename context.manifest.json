@@ -1,0 +1,21 @@
+{
+  "name": "liquid_light_show",
+  "type": "GENERATOR",
+  "title": "Liquid Light Show — 1960s Psychedelia",
+  "brief": "Full fluid solver (Stam stable-fluids + pressure projection) with Cahn-Hilliard phase separation, Rayleigh-B\u00e9nard thermal convection, and thin-film iridescence. 1960s oil-projector psychedelia. The big one. Batch-A-tier sim.",
+  "inputs": ["u_source"],
+  "outputs": ["projected_image"],
+  "tags": ["generator","fluid","simulation","psychedelic","oil","light_show"],
+  "adjacency": [
+    "thin_film_iridescence",
+    "structural_color",
+    "fluid_dynamics",
+    "klein-fluid-sim",
+    "ferrofluid_dance",
+    "psychedelic_collage",
+    "vintage_blacklight_poster_style",
+    "shoegaze_style"
+  ],
+  "status": "complete",
+  "batch": "B"
+}
